@@ -2,7 +2,10 @@
     <wb-module deploy-name="crm">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+<<<<<<< HEAD
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/conf"/>
+=======
+>>>>>>> branch 'master' of https://github.com/jianqinglvv/crm.git
         <property name="context-root" value="crm"/>
         <property name="java-output-path" value="/crm/build/classes"/>
     </wb-module>
