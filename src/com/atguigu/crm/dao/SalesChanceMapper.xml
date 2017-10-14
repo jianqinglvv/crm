@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crm.dao.SalesChanceMapper">
+
+
+	 <sql id="chanceCondition">
+	 	<where>
+	 			
+	 		<if test="status != null">
+				and status = #{status,jdbcType=NUMERIC}
+			</if>
+			<if test="statusNOT != null">
+				and status != #{statusNOT,jdbcType=NUMERIC}
+			</if>
+			<if test="custName != null">
+				and cust_Name like #{custName}
+			</if>
+			<if test="title != null">
+				and title like #{title}
+			</if>
+			<if test="contact != null">
+				and contact like #{contact}
+			</if>
+			<if test="designeeId != null">
+				and designee_id = #{designeeId}
+			</if>
+			
+			
+		</where>
+	 </sql>
+
+	<select id="getContent" resultType="com.atguigu.crm.entity.SalesChance">
+		SELECT * FROM 
+		(SELECT rownum rn,id,contact,contact_tel,create_date,status,
+			cust_name,title FROM sales_chances 
+			<include refid="chanceCondition"/>) t 
+			<![CDATA[
+			WHERE t.rn>=#{fromIndex} and t.rn < #{endIndex}
+			]]>
+	</select>
+	
+	
+
+	<select id="getTotalElements" resultType="int">
+		SELECT count(id) FROM sales_chances 
+		<include refid="chanceCondition"/>
+	</select>
+	
+	
+	<update id="update">
+		update sales_chances 
+			<set>
+			<if test="contact != null ">
+				contact=#{contact},
+			</if>
+			<if test="contactTel != null ">
+				contact_tel=#{contactTel},
+			</if>
+			<if test="custName != null ">
+				cust_name=#{custName},
+			</if>
+			<if test="description != null ">
+				description=#{description},
+			</if>
+			<if test="rate != null ">
+				rate=#{rate},
+			</if>
+			<if test="source != null ">
+			source=#{source},
+			</if>
+			<if test="title != null ">
+					title=#{title} ,
+			</if>
+			<if test="status != null and status != 0">
+					status = #{status},
+			</if>
+			
+			</set>
+		where id = #{id}
+	</update>
+
+
+</mapper>

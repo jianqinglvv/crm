@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crm.dao.CustMapper">
+	<sql id="customerCondition">
+		<where>
+				<if test="name != null and name != ''">
+					and cust.name like #{name}
+				</if>
+				<!-- 
+				<if test="manager != null and manager.name != ''">
+					and c.name like #{manager.name}
+				</if>
+				 -->
+				
+				<if test="managerName != null and managerName != ''">
+					and c.name like #{managerName}
+				</if>
+				
+				<if test="level != null and level != ''">
+					and customer_level = #{level}
+				</if>
+				<if test="state != null and state != ''">
+					and state = #{state}
+				</if>
+				<if test="region != null and region != ''">
+					and region = #{region}
+				</if>
+			</where>
+	</sql>
+	
+	<select id="getContent" resultType="com.atguigu.crm.entity.Customer">
+		select * from 
+		(select rownum rn,cust.id,no,cust.name,region,customer_level "level",manager_id as "manager.id",c.name as "manager.name",cust.state  
+		from customers cust left outer join contacts c on cust.manager_id = c.id 
+		<include refid="customerCondition"/>
+		) t 
+		<![CDATA[
+		 where t.rn>=#{fromIndex} and t.rn < #{endIndex}
+		]]>
+	</select>
+
+	<select id="getTotalElements" resultType="int">
+			SELECT count(cust.id) FROM customers cust left outer join contacts c on cust.manager_id = c.id 
+			<where>
+				<if test="name != null ">
+					and cust.name like #{name}
+				</if>
+				
+				<if test="managerName != null and managerName != ''">
+					and c.name like #{managerName}
+				</if>
+				<!-- 
+				<if test="manager != null">
+					and c.name like #{manager.name}
+				</if>
+				 -->
+				<if test="level != null and level != ''">
+					and customer_level = #{level}
+				</if>
+				<if test="state != null and state != ''">
+					and state = #{state}
+				</if>
+				
+				
+				<if test="region != null and region != ''">
+					and region = #{region}
+				</if>
+			</where>
+		</select>
+</mapper>
+<!-- 
+<if test="name != null and name != ''">
+					and cust.name like #{name}
+				</if>
+				<if test="manager != null and manager.name != ''">
+					and c.name like #{manager.name}
+				</if>
+				<if test="level != null and level != ''">
+					and customer_level = #{level}
+				</if>
+				<if test="state != null and state != ''">
+					and state = #{state}
+				</if>
+ -->

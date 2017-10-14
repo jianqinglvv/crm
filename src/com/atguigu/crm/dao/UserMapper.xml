@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crm.dao.UserMapper">
+
+
+	
+	 <sql id="chanceCondition">
+	 	<where>
+			<if test="name != null and name !=''">
+				and name like #{name}
+			</if>
+			<if test="enabled != null and enabled!=''">
+				and enabled = #{enabled}
+			</if>
+		</where>
+	 </sql>
+	 
+	 
+	 <resultMap type="com.atguigu.crm.entity.User" id="userMap">
+	 		<id column="id" property="id"/>
+	 		<result column="enabled" property="enabled"/>
+	 		<result column="name" property="name"/>
+	 		<result column="password" property="password"/>
+	 		<result column="salt" property="salt"/>
+	 		<result column="role.name" property="role.name"/>
+			
+			<collection property="role.authorities" ofType="com.atguigu.crm.entity.Authority">
+				<result column="a_name" property="name"/>
+				<result column="a_displayName" property="displayName"/>
+				<result column="a_url" property="url"/>
+				
+				<result column="parentAuthority.id" property="parentAuthority.id"/>
+				<result column="parentAuthority.displayName" property="parentAuthority.displayName"/>
+			</collection>
+
+	 </resultMap>
+	 
+	 <select id="getByName" resultMap="userMap">
+	 	select u.id ,u.name ,u.enabled ,password ,salt ,r.name as "role.name", 
+	 		a.name as a_name,a.display_name as a_displayName,a.url as a_url ,
+	 		pa.id as "parentAuthority.id", pa.display_name as "parentAuthority.displayName"
+			 from users u 
+			 left outer join roles r 
+			 on  u.role_id = r.id 
+			 left outer join role_authority ra 
+			 on ra.role_id = r.id 
+			 left outer join authorities a 
+			 on a.id = ra.authority_id 
+			 left outer join authorities pa 
+			 on pa.id = a.parent_authority_id 			 
+			 where u.name =#{name}
+	 </select>
+
+	<select id="getContent" resultType="com.atguigu.crm.entity.User">
+		SELECT * FROM 
+		(SELECT  rownum rn, id,name,enabled from users
+			<include refid="chanceCondition"/>) t 
+			<![CDATA[
+			WHERE t.rn>=#{fromIndex} and t.rn < #{endIndex}
+			]]>
+	</select>
+
+	<select id="getTotalElements" resultType="int">
+		select count(id) from users 
+		<include refid="chanceCondition"/>
+	</select>
+	<update id="update" >
+		update users
+		<set>
+			name =#{name},
+			<if test="password!=null and password !=''">
+				password=#{password},
+			</if>
+			enabled=#{enabled},
+			role_id =#{role.id} ,
+		</set>
+			where id=#{id}
+	</update>
+
+
+</mapper>
